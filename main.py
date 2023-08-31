@@ -19,7 +19,12 @@ while True:
 
 # delta_frame compares the first_frame with grey_frame_gaus when object appears color changes
     delta_frame = cv2.absdiff(first_frame, grey_frame_gaus)
-    cv2.imshow("my video", delta_frame)
+
+# tres_frame : to change color to pure white to catch difference
+    tresh_frame = cv2.threshold(delta_frame, 60, 255, cv2.THRESH_BINARY)[1]
+# del_frame : to delete the noise
+    del_frame = cv2.dilate(tresh_frame, None, iterations=2)
+    cv2.imshow("my video", del_frame)
 
     key = cv2.waitKey(1)
     if key == ord("q"):
