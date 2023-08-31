@@ -26,6 +26,14 @@ while True:
     del_frame = cv2.dilate(tresh_frame, None, iterations=2)
     cv2.imshow("my video", del_frame)
 
+# contours and green line added with rectangle
+    contours , check = cv2.findContours(del_frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    for contour in contours:
+        if cv2.contourArea(contour) < 5000:
+            continue
+        x, y, w, h = cv2.boundingRect(contour)
+        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 3)
+    cv2.imshow("video",frame)
     key = cv2.waitKey(1)
     if key == ord("q"):
         break
