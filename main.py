@@ -1,12 +1,14 @@
 import cv2
 import time
-
+from emailing import emailx
 video = cv2.VideoCapture(0)  # 0- primary inbuilt cam 1- secondary cam eg:usb cam
 time.sleep(1)
 
 first_frame = None
+status_list = []
 
 while True:
+    status = 0
     check, frame = video.read()
 
     # grey_frame : to reduce matrix complexity color changed to grey
@@ -24,7 +26,7 @@ while True:
     tresh_frame = cv2.threshold(delta_frame, 60, 255, cv2.THRESH_BINARY)[1]
 # del_frame : to delete the noise
     del_frame = cv2.dilate(tresh_frame, None, iterations=2)
-    cv2.imshow("my video", del_frame)
+    # cv2.imshow("my video", del_frame)
 
 # contours and green line added with rectangle
     contours , check = cv2.findContours(del_frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -32,7 +34,15 @@ while True:
         if cv2.contourArea(contour) < 5000:
             continue
         x, y, w, h = cv2.boundingRect(contour)
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 3)
+        rectangle = cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 3)
+        if rectangle.any():
+            status = 1
+
+    status_list.append(status)
+    status_list = status_list[-2:]
+    print(status_list)
+    if status_list[0] == 1 and status_list[1] == 0:
+        emailx()
     cv2.imshow("video",frame)
     key = cv2.waitKey(1)
     if key == ord("q"):
