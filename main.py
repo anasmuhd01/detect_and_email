@@ -1,4 +1,5 @@
 import glob
+import os
 
 import cv2
 import time
@@ -9,6 +10,11 @@ time.sleep(1)
 first_frame = None
 status_list = []
 count = 1
+
+def clear_img():
+    images = glob.glob("images/*.png")
+    for image in images:
+        os.remove(image)
 
 while True:
     status = 0
@@ -49,8 +55,11 @@ while True:
     status_list.append(status)
     status_list = status_list[-2:]
     print(status_list)
+
     if status_list[0] == 1 and status_list[1] == 0:
-        emailx()
+        emailx(image_with_object)
+        clear_img()
+
     cv2.imshow("video",frame)
     key = cv2.waitKey(1)
     if key == ord("q"):
