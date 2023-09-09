@@ -1,9 +1,10 @@
 import glob
 import os
-
+from threading import Thread
 import cv2
 import time
 from emailing import emailx
+
 video = cv2.VideoCapture(0)  # 0- primary inbuilt cam 1- secondary cam eg:usb cam
 time.sleep(1)
 
@@ -57,8 +58,14 @@ while True:
     print(status_list)
 
     if status_list[0] == 1 and status_list[1] == 0:
-        emailx(image_with_object)
-        clear_img()
+        email_thread = Thread(target=emailx, args=(image_with_object, ))
+        email_thread.daemon = True
+
+        clear_thread = Thread(target=clear_img)
+        email_thread.daemon = True
+
+        email_thread.start()
+
 
     cv2.imshow("video",frame)
     key = cv2.waitKey(1)
@@ -66,3 +73,4 @@ while True:
         break
 
 video.release()
+clear_thread.start()
